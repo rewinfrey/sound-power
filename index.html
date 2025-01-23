@@ -48,6 +48,15 @@
     const alphaValue = document.getElementById('alphaValue');
     const xValue = document.getElementById('xValue');
 
+    const width = canvas.width;
+    const height = canvas.height;
+    const padding = 50;
+
+    // Fixed axis limits
+    const hMin = 20;
+    const hMax = 32;
+    const PMax = 20;
+
     // Function to calculate P based on a numerical approximation of the integral
     function calculateP(alpha, x, h) {
       const step = Math.PI / 100; // Step size for integration
@@ -62,19 +71,7 @@
 
     // Function to draw the chart
     function drawChart(alpha, x) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Chart dimensions
-      const width = canvas.width;
-      const height = canvas.height;
-      const padding = 50;
-
-      // Define h values and calculate P for each
-      const hValues = Array.from({ length: 50 }, (_, i) => 20 + (i * (32 - 20)) / 49);
-      const PValues = hValues.map(h => calculateP(alpha, x, h));
-
-      // Find max P for scaling
-      const maxP = Math.max(...PValues);
+      ctx.clearRect(0, 0, width, height);
 
       // Draw axes
       ctx.strokeStyle = 'black';
@@ -95,8 +92,8 @@
 
       // Draw ticks and labels for x-axis (Height)
       const hStep = 2; // Step size for height ticks
-      for (let h = 20; h <= 32; h += hStep) {
-        const xPos = padding + ((h - 20) / (32 - 20)) * (width - 2 * padding);
+      for (let h = hMin; h <= hMax; h += hStep) {
+        const xPos = padding + ((h - hMin) / (hMax - hMin)) * (width - 2 * padding);
         ctx.beginPath();
         ctx.moveTo(xPos, height - padding);
         ctx.lineTo(xPos, height - padding + 5);
@@ -105,9 +102,9 @@
       }
 
       // Draw ticks and labels for y-axis (Power Flow)
-      const PStep = maxP / 5; // 5 steps for power flow
-      for (let P = 0; P <= maxP; P += PStep) {
-        const yPos = height - padding - (P / maxP) * (height - 2 * padding);
+      const PStep = PMax / 5; // 5 steps for power flow
+      for (let P = 0; P <= PMax; P += PStep) {
+        const yPos = height - padding - (P / PMax) * (height - 2 * padding);
         ctx.beginPath();
         ctx.moveTo(padding - 5, yPos);
         ctx.lineTo(padding, yPos);
@@ -115,12 +112,16 @@
         ctx.fillText(P.toFixed(1), padding - 35, yPos + 5);
       }
 
+      // Calculate data points
+      const hValues = Array.from({ length: 50 }, (_, i) => hMin + (i * (hMax - hMin)) / 49);
+      const PValues = hValues.map(h => calculateP(alpha, x, h));
+
       // Plot the data
       ctx.strokeStyle = 'blue';
       ctx.beginPath();
       hValues.forEach((h, i) => {
-        const x = padding + ((h - 20) / (32 - 20)) * (width - 2 * padding);
-        const y = height - padding - (PValues[i] / maxP) * (height - 2 * padding);
+        const x = padding + ((h - hMin) / (hMax - hMin)) * (width - 2 * padding);
+        const y = height - padding - (PValues[i] / PMax) * (height - 2 * padding);
         if (i === 0) {
           ctx.moveTo(x, y);
         } else {
