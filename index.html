@@ -57,10 +57,8 @@
     const height = canvas.height;
     const padding = 75;
 
-    // Fixed axis limits
     const xMin = 1;
     const xMax = 50;
-    const PMax = 20;
 
     // Function to calculate P based on a numerical approximation of the integral
     function calculateP(alpha, x, h) {
@@ -77,6 +75,21 @@
     // Function to draw the chart
     function drawChart(h) {
       ctx.clearRect(0, 0, width, height);
+
+      // Calculate max P dynamically
+      const alphaValues = Array.from({ length: 11 }, (_, i) => i * 0.1); // Alpha values: 0, 0.1, ..., 1
+      const xValues = Array.from({ length: 50 }, (_, i) => xMin + (i * (xMax - xMin)) / 49);
+      let maxP = 0;
+
+      alphaValues.forEach(alpha => {
+        xValues.forEach(x => {
+          const P = calculateP(alpha, x, h);
+          if (P > maxP) maxP = P;
+        });
+      });
+
+      // Add some padding to max P
+      maxP *= 1.1;
 
       // Draw axes
       ctx.strokeStyle = 'black';
@@ -107,9 +120,9 @@
       }
 
       // Draw y-axis ticks and labels on the right
-      const PStep = PMax / 5; // 5 steps for power flow
-      for (let P = 0; P <= PMax; P += PStep) {
-        const yPos = height - padding - (P / PMax) * (height - 2 * padding);
+      const PStep = maxP / 5; // 5 steps for power flow
+      for (let P = 0; P <= maxP; P += PStep) {
+        const yPos = height - padding - (P / maxP) * (height - 2 * padding);
         ctx.beginPath();
         ctx.moveTo(width - padding, yPos);
         ctx.lineTo(width - padding + 5, yPos);
@@ -118,16 +131,13 @@
       }
 
       // Draw multiple lines for alpha values
-      const alphaValues = Array.from({ length: 11 }, (_, i) => i * 0.1); // Alpha values: 0, 0.1, ..., 1
-      const xValues = Array.from({ length: 50 }, (_, i) => xMin + (i * (xMax - xMin)) / 49);
-
       alphaValues.forEach(alpha => {
         const PValues = xValues.map(x => calculateP(alpha, x, h));
         ctx.strokeStyle = `rgba(${255 - alpha * 255}, ${alpha * 255}, 128, 1)`; // Gradient colors
         ctx.beginPath();
         xValues.forEach((x, i) => {
           const xPos = padding + ((x - xMin) / (xMax - xMin)) * (width - 2 * padding);
-          const y = height - padding - (PValues[i] / PMax) * (height - 2 * padding);
+          const y = height - padding - (PValues[i] / maxP) * (height - 2 * padding);
           if (i === 0) {
             ctx.moveTo(xPos, y);
           } else {
@@ -138,7 +148,7 @@
 
         // Add label above each line near the end
         const labelX = width - padding - 80;
-        const labelY = height - padding - (PValues[PValues.length - 1] / PMax) * (height - 2 * padding) - 5;
+        const labelY = height - padding - (PValues[PValues.length - 1] / maxP) * (height - 2 * padding) - 5;
         ctx.fillStyle = 'black';
         ctx.font = '10px Arial';
         ctx.fillText(`α=${alpha.toFixed(1)}`, labelX, labelY);
