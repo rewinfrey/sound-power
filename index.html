@@ -125,9 +125,9 @@
         });
         ctx.stroke();
 
-        // Add label at the end of the line
-        const labelX = width - padding + 10;
-        const labelY = height - padding - (PValues[PValues.length - 1] / PMax) * (height - 2 * padding);
+        // Add label above each line near the left edge
+        const labelX = padding - 40;
+        const labelY = height - padding - (PValues[0] / PMax) * (height - 2 * padding) - 5;
         ctx.fillStyle = 'black';
         ctx.font = '10px Arial';
         ctx.fillText(`α=${alpha.toFixed(1)}`, labelX, labelY);
