@@ -79,7 +79,7 @@
       ctx.font = '14px Arial';
       ctx.fillText('Distance from Exit (x) [ft]', width / 2 - 50, height - 10);
       ctx.save();
-      ctx.translate(width - 10, height / 2);
+      ctx.translate(width - 30, height / 2);
       ctx.rotate(-Math.PI / 2);
       ctx.fillText('Power Flow (P)', 0, 0);
       ctx.restore();
@@ -125,9 +125,9 @@
         });
         ctx.stroke();
 
-        // Add label above each line near the left edge
-        const labelX = padding - 40;
-        const labelY = height - padding - (PValues[0] / PMax) * (height - 2 * padding) - 5;
+        // Add label above each line near the end
+        const labelX = width - padding - 80;
+        const labelY = height - padding - (PValues[PValues.length - 1] / PMax) * (height - 2 * padding) - 5;
         ctx.fillStyle = 'black';
         ctx.font = '10px Arial';
         ctx.fillText(`α=${alpha.toFixed(1)}`, labelX, labelY);
