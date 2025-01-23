@@ -65,7 +65,7 @@
       const step = Math.PI / 100; // Step size for integration
       let integral = 0;
       for (let theta = 0; theta < Math.PI / 2; theta += step) {
-        const numerator = 1 - alpha * x * Math.tan(theta);
+        const numerator = (1 - alpha) * x * Math.tan(theta);
         const denominator = Math.sqrt(1 + Math.pow(x / (h * Math.cos(theta)), 2));
         integral += (numerator / denominator) * step;
       }
