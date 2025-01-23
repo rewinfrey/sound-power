@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sound Power Flow Visualization</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+    }
+    canvas {
+      border: 1px solid black;
+    }
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .control-group {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Sound Power Flow Visualization</h1>
+  <canvas id="chart" width="800" height="400"></canvas>
+  <div class="controls">
+    <div class="control-group">
+      <label for="alpha">Absorption Coefficient (α): <span id="alphaValue">0.5</span></label>
+      <input type="range" id="alpha" min="0" max="1" step="0.01" value="0.5">
+    </div>
+    <div class="control-group">
+      <label for="x">Distance from Exit (x) [ft]: <span id="xValue">25</span></label>
+      <input type="range" id="x" min="1" max="50" step="1" value="25">
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('chart');
+    const ctx = canvas.getContext('2d');
+    const alphaSlider = document.getElementById('alpha');
+    const xSlider = document.getElementById('x');
+    const alphaValue = document.getElementById('alphaValue');
+    const xValue = document.getElementById('xValue');
+
+    // Function to calculate P based on the integral formula
+    function calculateP(alpha, x, h) {
+      const step = Math.PI / 100;
+      let integral = 0;
+      for (let theta = 0; theta < Math.PI / 2; theta += step) {
+        const numerator = (1 - alpha) * x * Math.tan(theta);
+        const denominator = Math.sqrt(1 + Math.pow(x / (h * Math.cos(theta)), 2));
+        integral += (numerator / denominator) * step;
+      }
+      return (2 / Math.PI) * integral;
+    }
+
+    // Function to draw the chart
+    function drawChart(alpha, x) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Chart dimensions
+      const width = canvas.width;
+      const height = canvas.height;
+      const padding = 50;
+
+      // Define h values and calculate P for each
+      const hValues = Array.from({ length: 50 }, (_, i) => 20 + (i * (32 - 20)) / 49);
+      const PValues = hValues.map(h => calculateP(alpha, x, h));
+
+      // Find max P for scaling
+      const maxP = Math.max(...PValues);
+
+      // Draw axes
+      ctx.strokeStyle = 'black';
+      ctx.beginPath();
+      ctx.moveTo(padding, height - padding);
+      ctx.lineTo(width - padding, height - padding);
+      ctx.lineTo(width - padding, padding);
+      ctx.stroke();
+
+      // Draw labels
+      ctx.font = '14px Arial';
+      ctx.fillText('Height (h) [ft]', width / 2, height - 10);
+      ctx.save();
+      ctx.translate(10, height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Power Flow (P)', 0, 0);
+      ctx.restore();
+
+      // Plot the data
+      ctx.strokeStyle = 'blue';
+      ctx.beginPath();
+      hValues.forEach((h, i) => {
+        const x = padding + ((h - 20) / (32 - 20)) * (width - 2 * padding);
+        const y = height - padding - (PValues[i] / maxP) * (height - 2 * padding);
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      ctx.stroke();
+    }
+
+    // Event listeners for sliders
+    alphaSlider.addEventListener('input', () => {
+      const alpha = parseFloat(alphaSlider.value);
+      const x = parseFloat(xSlider.value);
+      alphaValue.textContent = alpha.toFixed(2);
+      drawChart(alpha, x);
+    });
+
+    xSlider.addEventListener('input', () => {
+      const alpha = parseFloat(alphaSlider.value);
+      const x = parseFloat(xSlider.value);
+      xValue.textContent = x.toFixed(0);
+      drawChart(alpha, x);
+    });
+
+    // Initial draw
+    drawChart(parseFloat(alphaSlider.value), parseFloat(xSlider.value));
+  </script>
+</body>
+</html>
