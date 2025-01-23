@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sound Power Flow Visualization for &alpha; range [0-1] (inclusive) with step size 0.1 over <i>h</i> (height)</title>
+  <title>Sound Power Flow Visualization</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -28,7 +28,7 @@
   </style>
 </head>
 <body>
-  <h1>Sound Power Flow Visualization</h1>
+  <h1>Sound Power Flow Visualization for &alpha; range [0-1] (inclusive) with step size 0.1 over <i>h</i> (height)</h1>
   <canvas id="chart" width="800" height="400"></canvas>
   <div class="controls">
     <div class="control-group">
@@ -77,7 +77,7 @@
 
       // Add labels to axes
       ctx.font = '14px Arial';
-      ctx.fillText('Sound source distance from channel end (x) [ft]', width / 2 - 50, height - 20);
+      ctx.fillText('Sound source distance from channel end (x) [ft]', width / 2, height - 20);
       ctx.save();
       ctx.translate(width - 20, height / 2 + 50);
       ctx.rotate(-Math.PI / 2);
