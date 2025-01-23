@@ -32,29 +32,23 @@
   <canvas id="chart" width="800" height="400"></canvas>
   <div class="controls">
     <div class="control-group">
-      <label for="alpha">Absorption Coefficient (α): <span id="alphaValue">0.5</span></label>
-      <input type="range" id="alpha" min="0" max="1" step="0.01" value="0.5">
-    </div>
-    <div class="control-group">
-      <label for="x">Distance from Exit (x) [ft]: <span id="xValue">25</span></label>
-      <input type="range" id="x" min="1" max="50" step="1" value="25">
+      <label for="h">Height (h) [ft]: <span id="hValue">26</span></label>
+      <input type="range" id="h" min="20" max="32" step="1" value="26">
     </div>
   </div>
   <script>
     const canvas = document.getElementById('chart');
     const ctx = canvas.getContext('2d');
-    const alphaSlider = document.getElementById('alpha');
-    const xSlider = document.getElementById('x');
-    const alphaValue = document.getElementById('alphaValue');
-    const xValue = document.getElementById('xValue');
+    const hSlider = document.getElementById('h');
+    const hValue = document.getElementById('hValue');
 
     const width = canvas.width;
     const height = canvas.height;
     const padding = 50;
 
     // Fixed axis limits
-    const hMin = 20;
-    const hMax = 32;
+    const xMin = 1;
+    const xMax = 50;
     const PMax = 20;
 
     // Function to calculate P based on a numerical approximation of the integral
@@ -70,7 +64,7 @@
     }
 
     // Function to draw the chart
-    function drawChart(alpha, x) {
+    function drawChart(h) {
       ctx.clearRect(0, 0, width, height);
 
       // Draw axes
@@ -83,22 +77,22 @@
 
       // Add labels to axes
       ctx.font = '14px Arial';
-      ctx.fillText('Height (h) [ft]', width / 2 - 30, height - 10);
+      ctx.fillText('Distance from Exit (x) [ft]', width / 2 - 50, height - 10);
       ctx.save();
       ctx.translate(10, height / 2);
       ctx.rotate(-Math.PI / 2);
       ctx.fillText('Power Flow (P)', 0, 0);
       ctx.restore();
 
-      // Draw ticks and labels for x-axis (Height)
-      const hStep = 2; // Step size for height ticks
-      for (let h = hMin; h <= hMax; h += hStep) {
-        const xPos = padding + ((h - hMin) / (hMax - hMin)) * (width - 2 * padding);
+      // Draw ticks and labels for x-axis (Distance)
+      const xStep = 10; // Step size for distance ticks
+      for (let x = xMin; x <= xMax; x += xStep) {
+        const xPos = padding + ((x - xMin) / (xMax - xMin)) * (width - 2 * padding);
         ctx.beginPath();
         ctx.moveTo(xPos, height - padding);
         ctx.lineTo(xPos, height - padding + 5);
         ctx.stroke();
-        ctx.fillText(h, xPos - 10, height - padding + 20);
+        ctx.fillText(x, xPos - 10, height - padding + 20);
       }
 
       // Draw ticks and labels for y-axis (Power Flow)
@@ -112,39 +106,36 @@
         ctx.fillText(P.toFixed(1), padding - 35, yPos + 5);
       }
 
-      // Calculate data points
-      const hValues = Array.from({ length: 50 }, (_, i) => hMin + (i * (hMax - hMin)) / 49);
-      const PValues = hValues.map(h => calculateP(alpha, x, h));
+      // Draw multiple lines for alpha values
+      const alphaValues = Array.from({ length: 11 }, (_, i) => i * 0.1); // Alpha values: 0, 0.1, ..., 1
+      const xValues = Array.from({ length: 50 }, (_, i) => xMin + (i * (xMax - xMin)) / 49);
 
-      // Plot the data
-      ctx.strokeStyle = 'blue';
-      ctx.beginPath();
-      hValues.forEach((h, i) => {
-        const x = padding + ((h - hMin) / (hMax - hMin)) * (width - 2 * padding);
-        const y = height - padding - (PValues[i] / PMax) * (height - 2 * padding);
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
+      alphaValues.forEach(alpha => {
+        const PValues = xValues.map(x => calculateP(alpha, x, h));
+        ctx.strokeStyle = `rgba(${255 - alpha * 255}, ${alpha * 255}, 128, 1)`; // Gradient colors
+        ctx.beginPath();
+        xValues.forEach((x, i) => {
+          const xPos = padding + ((x - xMin) / (xMax - xMin)) * (width - 2 * padding);
+          const y = height - padding - (PValues[i] / PMax) * (height - 2 * padding);
+          if (i === 0) {
+            ctx.moveTo(xPos, y);
+          } else {
+            ctx.lineTo(xPos, y);
+          }
+        });
+        ctx.stroke();
       });
-      ctx.stroke();
     }
 
-    // Event listeners for sliders
-    function updateChart() {
-      const alpha = parseFloat(alphaSlider.value);
-      const x = parseFloat(xSlider.value);
-      alphaValue.textContent = alpha.toFixed(2);
-      xValue.textContent = x.toFixed(0);
-      drawChart(alpha, x);
-    }
-
-    alphaSlider.addEventListener('input', updateChart);
-    xSlider.addEventListener('input', updateChart);
+    // Event listener for the height slider
+    hSlider.addEventListener('input', () => {
+      const h = parseFloat(hSlider.value);
+      hValue.textContent = h.toFixed(0);
+      drawChart(h);
+    });
 
     // Initial draw
-    updateChart();
+    drawChart(parseFloat(hSlider.value));
   </script>
 </body>
 </html>
