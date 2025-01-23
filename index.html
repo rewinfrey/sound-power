@@ -32,7 +32,7 @@
   <canvas id="chart" width="800" height="400"></canvas>
   <div class="controls">
     <div class="control-group">
-      <label for="h">Height (h) [ft]: <span id="hValue">26</span></label>
+      <label for="h">Warehouse wall height (h) [ft]: <span id="hValue">26</span></label>
       <input type="range" id="h" min="20" max="32" step="1" value="26">
     </div>
   </div>
@@ -77,7 +77,7 @@
 
       // Add labels to axes
       ctx.font = '14px Arial';
-      ctx.fillText('Distance from Exit (x) [ft]', width / 2 - 50, height - 20);
+      ctx.fillText('Sound source distance from channel end (x) [ft]', width / 2 - 50, height - 20);
       ctx.save();
       ctx.translate(width - 20, height / 2 + 50);
       ctx.rotate(-Math.PI / 2);
