@@ -191,15 +191,15 @@
     });
 
     // Event listener for the exponent expression's height slider
-    hExponentSlider.addEventListener('input', () => {
-      const h = parseFloat(hExponentSlider.value);
-      hExponentValue.textContent = h.toFixed(0);
-      drawChart(ctxExponent, h, calculatePExponent);
-    });
+    // hExponentSlider.addEventListener('input', () => {
+    //   const h = parseFloat(hExponentSlider.value);
+    //   hExponentValue.textContent = h.toFixed(0);
+    //   drawChart(ctxExponent, h, calculatePExponent);
+    // });
 
     // Initial draw
     drawChart(ctxProduct, parseFloat(hProductSlider.value), calculatePProduct);
-    drawChart(ctxExponent, parseFloat(hExponentSlider.value), calculatePExponent);
+    //drawChart(ctxExponent, parseFloat(hExponentSlider.value), calculatePExponent);
   </script>
 </body>
 </html>
