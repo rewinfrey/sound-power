@@ -40,42 +40,68 @@
     \( P \sim \frac{2}{\pi} \displaystyle \int_0^{\frac{\pi}{2}} 
     \frac{(1 - \alpha) \cdot x \tan \theta}{\sqrt{1 + \left(\frac{x}{h \cos \theta}\right)^2}} \, d\theta. \)
   </div>
-  <canvas id="chart" width="800" height="400"></canvas>
+  <canvas id="chart-product" width="800" height="400"></canvas>
   <div class="controls">
     <div class="control-group">
-      <label for="h">Warehouse wall height (h) [ft]: <span id="hValue">26</span></label>
-      <input type="range" id="h" min="20" max="32" step="1" value="26">
+      <label for="h">Warehouse wall height (h) [ft]: <span id="hProductValue">26</span></label>
+      <input type="range" id="hProduct" min="20" max="32" step="1" value="26">
+    </div>
+  </div>
+  
+  <h1>Sound power flow for <i>&alpha;</i> [0-1] with step size 0.1 over height (<i>h</i>) for the expression:</h1>
+  <div class="math-container">
+    \( P \sim \frac{2}{\pi} \displaystyle \int_0^{\frac{\pi}{2}} 
+    \frac{(1 - \alpha)^{x \tan \theta}{\sqrt{1 + \left(\frac{x}{h \cos \theta}\right)^2}} \, d\theta. \)
+  </div>  
+  <canvas id="chart-exponent" width="800" height="400"></canvas>
+  <div class="controls">
+    <div class="control-group">
+      <label for="h">Warehouse wall height (h) [ft]: <span id="hExponentValue">26</span></label>
+      <input type="range" id="hExponent" min="20" max="32" step="1" value="26">
     </div>
   </div>
   <script>
-    const canvas = document.getElementById('chart');
-    const ctx = canvas.getContext('2d');
-    const hSlider = document.getElementById('h');
-    const hValue = document.getElementById('hValue');
+    const canvasProduct = document.getElementById('chart-product');
+    const ctxProduct = canvasProduct.getContext('2d');
+    const hProductSlider = document.getElementById('hProduct');
+    const hProductValue = document.getElementById('hProductValue');
 
-    const width = canvas.width;
-    const height = canvas.height;
-    const padding = 75;
+    const canvasExponent = document.getElementById('chart-exponent');
+    const ctxExponent = canvasExponent.getContext('2d');
+    const hExponentSlider = document.getElementById('hExponent');
+    const hExponentValue = document.getElementById('hExponentValue');
 
-    // Fixed axis limits
-    const xMin = 1;
-    const xMax = 50;
-    const PMax = 20; // Fixed maximum for Power Flow (P)
-
-    // Function to calculate P based on a numerical approximation of the integral
-    function calculateP(alpha, x, h) {
+    function calculatePProduct(alpha, x, h) {
       const step = Math.PI / 100; // Step size for integration
       let integral = 0;
       for (let theta = 0; theta < Math.PI / 2; theta += step) {
-        const numerator = (1 - alpha) * x * Math.tan(theta); // Corrected numerator
+        const numerator = (1 - alpha) * x * Math.tan(theta);
         const denominator = Math.sqrt(1 + Math.pow(x / (h * Math.cos(theta)), 2));
         integral += (numerator / denominator) * step;
       }
       return (2 / Math.PI) * integral;
     }
 
-    // Function to draw the chart
-    function drawChart(h) {
+    function calculatePExponent(alpha, x, h) {
+      const step = Math.PI / 100; // Step size for integration
+      let integral = 0;
+      for (let theta = 0; theta < Math.PI / 2; theta += step) {
+        const numerator = Math.pow((1 - alpha), x * Math.tan(theta));
+        const denominator = Math.sqrt(1 + Math.pow(x / (h * Math.cos(theta)), 2));
+        integral += (numerator / denominator) * step;
+      }
+      return (2 / Math.PI) * integral;
+    }
+    
+    // Fixed axis limits
+    const xMin = 1;
+    const xMax = 50;
+    const PMax = 20; // Fixed maximum for Power Flow (P)
+    const padding = 75;
+    function drawProductChart(ctx, h, powerFunc) {
+      width = ctx.width;
+      height = ctx.height;
+      
       ctx.clearRect(0, 0, width, height);
 
       // Draw axes
@@ -122,7 +148,7 @@
       const xValues = Array.from({ length: 50 }, (_, i) => xMin + (i * (xMax - xMin)) / 49);
 
       alphaValues.forEach(alpha => {
-        const PValues = xValues.map(x => calculateP(alpha, x, h));
+        const PValues = xValues.map(x => powerFunc(alpha, x, h));
         ctx.strokeStyle = `rgba(${255 - alpha * 255}, ${alpha * 255}, 128, 1)`; // Gradient colors
         ctx.beginPath();
         xValues.forEach((x, i) => {
@@ -154,15 +180,23 @@
       ctx.lineWidth = 1; // Reset line width
     }
 
-    // Event listener for the height slider
-    hSlider.addEventListener('input', () => {
-      const h = parseFloat(hSlider.value);
-      hValue.textContent = h.toFixed(0);
-      drawChart(h);
+    // Event listener for the product expression's height slider
+    hProductSlider.addEventListener('input', () => {
+      const h = parseFloat(hProductSlider.value);
+      hProductValue.textContent = h.toFixed(0);
+      drawChart(ctxProduct, h, calculatePProduct);
+    });
+
+    // Event listener for the exponent expression's height slider
+    hExponentSlider.addEventListener('input', () => {
+      const h = parseFloat(hExponentSlider.value);
+      hExponentValue.textContent = h.toFixed(0);
+      drawChart(ctxExponent, h, calculatePExponent);
     });
 
     // Initial draw
-    drawChart(parseFloat(hSlider.value));
+    drawChart(ctxProduct, parseFloat(hProductSlider.value), calculatePProduct);
+    drawChart(ctxExponent, parseFloat(hExponentSlider.value), calculatePExponent);
   </script>
 </body>
 </html>
