@@ -51,7 +51,7 @@
   <h1>Sound power flow for <i>&alpha;</i> [0-1] with step size 0.1 over height (<i>h</i>) for the expression:</h1>
   <div class="math-container">
     \( P \sim \frac{2}{\pi} \displaystyle \int_0^{\frac{\pi}{2}} 
-    \frac{(1 - \alpha)^{x \tan \theta}{\sqrt{1 + \left(\frac{x}{h \cos \theta}\right)^2}} \, d\theta. \)
+    \frac{{(1 - \alpha)}^{x \tan \theta}{\sqrt{1 + \left(\frac{x}{h \cos \theta}\right)^2}} \, d\theta. \)
   </div>  
   <canvas id="chart-exponent" width="800" height="400"></canvas>
   <div class="controls">
@@ -98,7 +98,7 @@
     const xMax = 50;
     const PMax = 20; // Fixed maximum for Power Flow (P)
     const padding = 75;
-    function drawProductChart(ctx, h, powerFunc) {
+    function drawChart(ctx, h, powerFunc) {
       width = ctx.width;
       height = ctx.height;
       
