@@ -43,7 +43,7 @@
   <canvas id="chart-product" width="800" height="400"></canvas>
   <div class="controls">
     <div class="control-group">
-      <label for="h">Warehouse wall height (h) [ft]: <span id="hProductValue">26</span></label>
+      <label for="hProduct">Warehouse wall height (h) [ft]: <span id="hProductValue">26</span></label>
       <input type="range" id="hProduct" min="20" max="32" step="1" value="26">
     </div>
   </div>
@@ -51,12 +51,12 @@
   <h1>Sound power flow for <i>&alpha;</i> [0-1] with step size 0.1 over height (<i>h</i>) for the expression:</h1>
   <div class="math-container">
     \( P \sim \frac{2}{\pi} \displaystyle \int_0^{\frac{\pi}{2}} 
-    \frac{{(1 - \alpha)}^{x \tan \theta}{\sqrt{1 + \left(\frac{x}{h \cos \theta}\right)^2}} \, d\theta. \)
+    \frac{(1 - \alpha)^{x \tan \theta}}{\sqrt{1 + \left(\frac{x}{h \cos \theta}\right)^2}} \, d\theta. \)
   </div>  
   <canvas id="chart-exponent" width="800" height="400"></canvas>
   <div class="controls">
     <div class="control-group">
-      <label for="h">Warehouse wall height (h) [ft]: <span id="hExponentValue">26</span></label>
+      <label for="hExponent">Warehouse wall height (h) [ft]: <span id="hExponentValue">26</span></label>
       <input type="range" id="hExponent" min="20" max="32" step="1" value="26">
     </div>
   </div>
@@ -99,6 +99,9 @@
     const PMax = 20; // Fixed maximum for Power Flow (P)
     const padding = 75;
     function drawChart(ctx, h, powerFunc) {
+      console.log("ctx: ", ctx);
+      console.log("h: ", h);
+      console.log("powerFunc: ", powerFunc);
       width = ctx.width;
       height = ctx.height;
       
